@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/chunk.schema.json",
+  "title": "Chunk",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "chunk_id": { "type": "string", "description": "Hash of chunk bytes (SHA-256 hex or base64url)" },
+    "size": { "type": "integer", "minimum": 0 },
+    "encoding": { "type": "string", "enum": ["raw", "base64", "hex"], "description": "Encoding used in JSON transport; prefer raw framing on binary transports" },
+    "data": { "type": "string", "description": "Encoded chunk data (base64 when encoding=base64)" },
+    "encrypted": { "type": "boolean", "description": "True if the chunk bytes are encrypted with AEAD" }
+  },
+  "required": ["chunk_id", "size"],
+  "examples": [
+    {
+      "chunk_id": "sha256-abcdef...",
+      "size": 1024,
+      "encoding": "base64",
+      "data": "BASE64_ENCODED_CHUNK",
+      "encrypted": false
+    }
+  ]
+}
