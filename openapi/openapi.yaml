@@ -1,0 +1,229 @@
+openapi: 3.1.0
+info:
+  title: Open Share Protocol - Registration API
+  description: |
+    Minimal server API for Open Share: account & device registration, CRL, and trust root.
+    Canonical JSON Schemas are in /openapi/components/schemas (draft-2020-12).
+  version: "1.0.0"
+  x-protocol-version: "1.0.0"
+servers:
+  - url: https://api.example.com
+    description: Production server
+  - url: https://staging.api.example.com
+    description: Staging server
+paths:
+  /account/register:
+    post:
+      summary: Create account
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: alice@example.com
+                display_name:
+                  type: string
+                  example: "Alice's Phone"
+              required:
+                - email
+      responses:
+        "201":
+          description: Account created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account_id:
+                    type: string
+                    example: acct-zz99
+                  api_token:
+                    type: string
+                    description: Bearer token for account-scoped requests (short-lived)
+        "400":
+          $ref: '#/components/responses/BadRequest'
+  /device/register:
+    post:
+      summary: Register device and request certificate
+      operationId: registerDevice
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/device-cert-registration'
+            examples:
+              register-request:
+                value:
+                  device_id: "dev-7a3b"
+                  pubkey_ed25519: "BASE64URL..."
+                  metadata:
+                    os: "linux"
+                    name: "alice-laptop"
+      responses:
+        "201":
+          description: Device certificate issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/device-cert'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+  /account/devices:
+    get:
+      summary: List devices for account
+      operationId: listDevices
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Devices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/device-cert'
+  /device/revoke:
+    post:
+      summary: Revoke a device
+      operationId: revokeDevice
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+              required:
+                - device_id
+      responses:
+        "200":
+          description: Revoked
+  /crl:
+    get:
+      summary: Get current CRL
+      operationId: getCRL
+      parameters:
+        - name: If-None-Match
+          in: header
+          schema:
+            type: string
+          description: ETag to allow 304 Not Modified
+      responses:
+        "200":
+          description: CRL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/crl'
+        "304":
+          description: Not Modified
+  /trustroot:
+    get:
+      summary: Get server trust root(s) and supported protocol versions
+      operationId: getTrustRoot
+      responses:
+        "200":
+          description: Trust root info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trust_roots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key_id:
+                          type: string
+                        pubkey_ed25519:
+                          type: string
+                        valid_from:
+                          type: string
+                          format: date-time
+                        valid_to:
+                          type: string
+                          format: date-time
+                  min_protocol_version:
+                    type: string
+                    example: "1.0.0"
+                  max_protocol_version:
+                    type: string
+                    example: "1.2.0"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    mutualTLS:
+      type: mutualTLS
+  responses:
+    BadRequest:
+      description: Bad request
+    Unauthorized:
+      description: Unauthorized
+  schemas:
+    # Registration request for /device/register
+    device-cert-registration:
+      type: object
+      properties:
+        device_id:
+          type: string
+        pubkey_ed25519:
+          type: string
+          description: base64url of Ed25519 public key
+        metadata:
+          type: object
+      required:
+        - device_id
+        - pubkey_ed25519
+    # Refer to canonical schema files in components/schemas folder for full definitions
+    device-cert:
+      $ref: './components/schemas/device-cert.schema.json'
+    file-manifest:
+      $ref: './components/schemas/file-manifest.schema.json'
+    chunk:
+      $ref: './components/schemas/chunk.schema.json'
+    crl:
+      $ref: './components/schemas/crl.schema.json'
+    pairing-token:
+      $ref: './components/schemas/pairing-token.schema.json'
+  examples:
+    deviceCertSigned:
+      summary: Example device certificate
+      value:
+        $ref: './components/examples/device-cert-example.json'
+    crlExample:
+      summary: Example CRL
+      value:
+        $ref: './components/examples/crl-example.json'
+    manifestExample:
+      summary: Example manifest
+      value:
+        $ref: './components/examples/manifest-example.json'
+tags:
+  - name: account
+  - name: device
+  - name: trust
+x-vendor:
+  notes: |
+    - This OpenAPI file uses JSON Schema draft-2020-12 for shared schemas.
+    - Signatures use Ed25519 over canonicalized JSON (JCS recommended).
