@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/crl.schema.json",
+  "title": "Certificate Revocation List",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "revoked_device_ids": { "type": "array", "items": { "type": "string" } },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "issuer_id": { "type": "string" },
+    "version": { "type": "integer", "minimum": 0 },
+    "sig": { "type": "string", "description": "Server signature over canonicalized CRL" }
+  },
+  "required": ["revoked_device_ids", "issued_at", "issuer_id", "version", "sig"],
+  "examples": [
+    {
+      "revoked_device_ids": ["dev-revoked-1"],
+      "issued_at": "2025-10-01T12:00:00Z",
+      "issuer_id": "server-1",
+      "version": 1,
+      "sig": "BASE64URL_SIG_PLACEHOLDER"
+    }
+  ]
+}
