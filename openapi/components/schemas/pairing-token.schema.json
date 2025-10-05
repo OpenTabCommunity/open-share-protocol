@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/pairing-token.schema.json",
+  "title": "Offline Pairing Token",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "token": { "type": "string", "description": "Opaque compact token (e.g., base64url or JWS-like)" },
+    "issued_by_device_id": { "type": "string" },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "nonce": { "type": "string" },
+    "new_pubkey": { "type": "string", "description": "Optional: new device pubkey (base64url)" }
+  },
+  "required": ["token", "issued_by_device_id", "issued_at", "expires_at", "nonce"],
+  "examples": [
+    {
+      "token": "BASE64URL_TOKEN_PLACEHOLDER",
+      "issued_by_device_id": "dev-1",
+      "issued_at": "2025-10-01T12:00:00Z",
+      "expires_at": "2025-10-01T12:05:00Z",
+      "nonce": "randomnonce123",
+      "new_pubkey": "BASE64URL_PUBKEY_OPTIONAL"
+    }
+  ]
+}
