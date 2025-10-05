@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/file-manifest.schema.json",
+  "title": "File Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "manifest_id": { "type": "string", "description": "UUID or stable manifest hash" },
+    "filename": { "type": "string" },
+    "size": { "type": "integer", "minimum": 0 },
+    "chunk_hashes": { "type": "array", "items": { "type": "string" } },
+    "chunk_size": { "type": "integer", "description": "Standard chunk size in bytes used by sender" },
+    "dedup": { "type": "boolean" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "sender_sig": { "type": "string", "description": "Base64url signature of manifest by sender device" },
+    "content_type": { "type": "string" }
+  },
+  "required": ["manifest_id", "filename", "size", "chunk_hashes", "timestamp", "sender_sig"],
+  "examples": [
+    {
+      "manifest_id": "manifest-1234",
+      "filename": "example.txt",
+      "size": 1024,
+      "chunk_hashes": ["abcdef..."],
+      "chunk_size": 262144,
+      "dedup": true,
+      "timestamp": "2025-10-01T12:00:00Z",
+      "sender_sig": "BASE64URL_SIG_PLACEHOLDER",
+      "content_type": "text/plain"
+    }
+  ]
+}
