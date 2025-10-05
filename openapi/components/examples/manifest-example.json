@@ -1,0 +1,11 @@
+{
+  "manifest_id": "manifest-test-1",
+  "filename": "example.txt",
+  "size": 1024,
+  "chunk_hashes": ["sha256:abcdef012345..."],
+  "chunk_size": 262144,
+  "dedup": true,
+  "timestamp": "2025-10-01T12:00:00Z",
+  "sender_sig": "PLACEHOLDER_SIGNATURE_BASE64URL",
+  "content_type": "text/plain"
+}
