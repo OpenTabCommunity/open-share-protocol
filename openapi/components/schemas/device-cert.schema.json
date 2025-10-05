@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/device-cert.schema.json",
+  "title": "Device Certificate",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "device_id": { "type": "string", "description": "Unique device identifier" },
+    "account_id": { "type": "string", "description": "Account this device belongs to" },
+    "pubkey_ed25519": { "type": "string", "description": "Base64url encoded Ed25519 public key" },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "sig": { "type": "string", "description": "Base64url Ed25519 signature over canonicalized cert fields" },
+    "meta": { "type": "object", "additionalProperties": true, "description": "Optional free-form metadata (OS, client version, device name)" }
+  },
+  "required": ["device_id", "account_id", "pubkey_ed25519", "issued_at", "expires_at", "sig"],
+  "examples": [
+    {
+      "device_id": "dev-test-1",
+      "account_id": "acct-test-1",
+      "pubkey_ed25519": "BASE64URL_PUBLIC_KEY_PLACEHOLDER",
+      "issued_at": "2025-09-01T12:00:00Z",
+      "expires_at": "2027-09-01T12:00:00Z",
+      "sig": "BASE64URL_SIGNATURE_PLACEHOLDER",
+      "meta": { "os": "linux", "name": "alice-laptop", "client_version": "1.0.0" }
+    }
+  ]
+}
